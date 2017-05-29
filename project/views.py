@@ -2,7 +2,7 @@ from apistar import http, Response
 from project.encoder import encoder
 from project.db import urls, get_next_sequence
 
-base_url = "http://localhost:8080/"
+base_url = "https://afternoon-lowlands-76627.herokuapp.com/"
 
 
 def new(url):
