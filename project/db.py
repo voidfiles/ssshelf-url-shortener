@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
+from os import environ
 
-client = MongoClient('localhost', 27017)
+client = MongoClient(f"mongodb://{environ.get('MONGOUSR')}:{environ.get('MONGOPWD')}@ds157571.mlab.com:57571/urls_db")
 db = client.urls_db
 urls = db.urls
 

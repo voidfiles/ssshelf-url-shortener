@@ -1,1 +1,1 @@
-web: gunicorn app:app.wsgi --workers=1 --bind=0.0.0.0:8000 --pid=pid --worker-class=meinheld.gmeinheld.MeinheldWorker
+web: gunicorn app:app.wsgi --workers=1 --bind=0.0.0.0:8000 --pid=pid
