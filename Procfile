@@ -1,1 +1,1 @@
-web: gunicorn app:app.wsgi --workers=1 --bind=0.0.0.0:8000 --pid=pid
+web: gunicorn app:app.wsgi --workers=1 --bind=0.0.0.0:$PORT --pid=pid
