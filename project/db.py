@@ -1,13 +1,31 @@
-from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
-from os import environ
+import json
+import os
 
-client = MongoClient(f"mongodb://{environ.get('MONGOUSR')}:{environ.get('MONGOPWD')}@ds157571.mlab.com:57571/urls_db")
-db = client.urls_db
-urls = db.urls
+import simpleflake
+
+from ssshelf.items import IManager
+from ssshelf.utils import json_dump
+from ssshelf.storages.s3 import S3Storage
+from ssshelf.keys import encode_int_as_str
 
 
-def get_next_sequence(name):
-    ret = db.counters.find_and_modify(
-        {'_id': name}, update={'$inc': {'seq': 1}}, new=True)
-    return ret['seq']
+def create_url(url):
+    return {
+        'url': url,
+        'pk': encode_int_as_str(int(simpleflake.simpleflake())),
+    }
+
+
+class ShortURL(IManager):
+    def get_pk(self, item):
+        return item.get('pk')
+
+    def serialize_item(self, item):
+        return bytes(json_dump(item), 'utf8')
+
+    def deserialize_item(self, data):
+        return json.loads(data)
+
+short_url_manager = ShortURL(
+    storage=S3Storage(bucket=os.environ.get('AWS_BUCKET'))
+)

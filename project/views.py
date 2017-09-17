@@ -1,32 +1,38 @@
+import json
+import asyncio
 from apistar import http, Response
-from project.encoder import encoder
-from project.db import urls, get_next_sequence
+from apistar.interfaces import Router
+from project.db import short_url_manager, create_url
 
 base_url = "https://afternoon-lowlands-76627.herokuapp.com/"
 
+loop = asyncio.get_event_loop()
 
-def new(url):
-    match = urls.find_one({'url': url})
-    if match is not None:
-        url_id = match['_id']
-    else:
-        url_id = urls.insert_one({
-            '_id': get_next_sequence("userid"),
-            'url': url
-        }).inserted_id
+
+def new(body: http.Body, router: Router, request: http.Request):
+    data = json.loads(body)
+    url_data = create_url(data.get('url'))
+    loop.run_until_complete(short_url_manager.add_item(url_data))
+    base_url = 'http://%s' % (request.headers['host'])
+    base_url += router.reverse_url('redirect', {'short_url': url_data.get('pk')})
+
     return {
-        "original_url": url,
-        "short_url": base_url + encoder.encode(int(url_id))
+        "original_url": url_data.get('url'),
+        "short_url": base_url,
     }
 
 
 def redirect(short_url) -> Response:
-    mongo_id = encoder.decode(short_url)
-    long_url = urls.find_one({'_id': mongo_id})
-    if long_url is not None:
-        headers = {'Location': 'http://' + long_url['url'] + '.com'}
-        return Response(None, status=302, headers=headers)
-    resp = {
-        "error": "This url is not on the database."
-    }
-    return Response(resp, status=404)
+    print("Short url %s" % (short_url))
+    url_data = loop.run_until_complete(short_url_manager.get_item(short_url))
+    print(url_data)
+    if not url_data:
+        resp = {
+            "error": "This url is not on the database."
+        }
+
+        return Response(resp, status=404)
+
+    headers = {'Location': url_data['url']}
+
+    return Response(None, status=302, headers=headers)

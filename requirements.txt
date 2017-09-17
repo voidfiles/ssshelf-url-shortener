@@ -1,3 +1,5 @@
 apistar
 gunicorn
-pymongo
+ssshelf==0.0.2
+simpleflake
+pytest

@@ -1,12 +1,13 @@
 from apistar import Include, Route
-from apistar.docs import docs_routes
-from apistar.statics import static_routes
+from apistar.handlers import docs_urls, static_urls
 from project.views import new, redirect
+from apistar.frameworks.wsgi import WSGIApp as App
 
 routes = [
+    Route('/new/', 'POST', new),
+    Include('/docs', docs_urls),
+    Include('/static', static_urls),
     Route('/{short_url}/', 'GET', redirect),
-    Route('/new/http://www.{url}.com/', 'GET', new),
-    Route('/new/https://www.{url}.com/', 'GET', new),
-    Include('/docs', docs_routes),
-    Include('/static', static_routes)
 ]
+
+app = App(routes=routes)
