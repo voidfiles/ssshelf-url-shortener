@@ -9,10 +9,12 @@ base_url = "https://afternoon-lowlands-76627.herokuapp.com/"
 loop = asyncio.get_event_loop()
 
 
-def new(body: http.Body, router: Router, request: http.Request):
+async def new(body: http.Body, router: Router, request: http.Request):
     data = json.loads(body)
     url_data = create_url(data.get('url'))
-    loop.run_until_complete(short_url_manager.add_item(url_data))
+
+    await short_url_manager.add_item(url_data)
+
     base_url = 'http://%s' % (request.headers['host'])
     base_url += router.reverse_url('redirect', {'short_url': url_data.get('pk')})
 
@@ -22,16 +24,14 @@ def new(body: http.Body, router: Router, request: http.Request):
     }
 
 
-def redirect(short_url) -> Response:
-    print("Short url %s" % (short_url))
-    url_data = loop.run_until_complete(short_url_manager.get_item(short_url))
-    print(url_data)
+async def redirect(short_url) -> Response:
+    url_data = await short_url_manager.get_item(short_url)
     if not url_data:
         resp = {
             "error": "This url is not on the database."
         }
 
-        return Response(resp, status=404)
+        return Response(resp, status=404, headers={})
 
     headers = {'Location': url_data['url']}
 

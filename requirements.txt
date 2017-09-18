@@ -1,5 +1,8 @@
 apistar
 gunicorn
-ssshelf==0.0.2
+ssshelf==0.0.3
 simpleflake
 pytest
+uvicorn
+uvitools
+git+https://github.com/what-studio/profiling.git@eventloop-aware
