@@ -6,6 +6,7 @@ import simpleflake
 from ssshelf.items import IManager
 from ssshelf.utils import json_dump
 from ssshelf.storages.s3 import S3Storage
+from ssshelf.storages.cached import ReadCacheInMemory
 from ssshelf.keys import encode_int_as_str
 
 
@@ -27,5 +28,5 @@ class ShortURL(IManager):
         return json.loads(data)
 
 short_url_manager = ShortURL(
-    storage=S3Storage(bucket=os.environ.get('AWS_BUCKET'))
+    storage=ReadCacheInMemory(S3Storage(bucket=os.environ.get('AWS_BUCKET')))
 )

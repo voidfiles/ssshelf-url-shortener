@@ -1,6 +1,6 @@
 apistar
 gunicorn
-ssshelf==0.0.3
+ssshelf==0.0.4
 simpleflake
 pytest
 uvicorn
