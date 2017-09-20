@@ -5,4 +5,3 @@ simpleflake
 pytest
 uvicorn
 uvitools
-git+https://github.com/what-studio/profiling.git@eventloop-aware
