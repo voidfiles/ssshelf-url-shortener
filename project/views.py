@@ -35,4 +35,4 @@ async def redirect(short_url) -> Response:
 
     headers = {'Location': url_data['url']}
 
-    return Response(None, status=302, headers=headers)
+    return Response(b"", status=302, headers=headers)
